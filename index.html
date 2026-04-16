@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teach Place | Discord Bot Academy</title>
+    <style>
+        :root {
+            --primary: #5865F2; /* Discord Blue */
+            --primary-dark: #4752C4;
+            --secondary: #3BA55D; /* Discord Success */
+            --danger: #ED4245; /* Discord Danger */
+            --warning: #FEE75C;
+            --bg-body: #f0f2f5;
+            --bg-card: #ffffff;
+            --text-main: #2e3338;
+            --text-muted: #4f5660;
+            --border: #e3e5e8;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+            --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #36393f;
+            --bg-card: #2f3136;
+            --text-main: #ffffff;
+            --text-muted: #b9bbbe;
+            --border: #202225;
+            --shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Utils */
+        .hidden { display: none !important; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+
+        /* Background Decorations */
+        .bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .glow-circle {
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(88,101,242,0.15) 0%, transparent 70%);
+            filter: blur(50px);
+            border-radius: 50%;
+        }
+
+        /* Header */
+        header {
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, var(--primary), #8ea1ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .controls button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.6rem;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        /* Screen 1: Home */
+        #screen-home {
+            max-width: 1000px;
+            margin: 2rem auto;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        .hero h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .hero p { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 3rem; }
+
+        .worlds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .world-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .world-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .world-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .world-card h3 { margin: 0.5rem 0; }
+        .world-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* Screen 2: Lesson */
+        #screen-lesson {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+
+        .lesson-header { text-align: center; margin-bottom: 2rem; }
+        .lesson-card {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .tech-key {
+            background: rgba(88, 101, 242, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+
+        .concepts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .concept-item {
+            background: var(--bg-body);
+            padding: 1rem;
+            border-radius: 10px;
+            border: 1px dashed var(--border);
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 2rem;
+        }
+
+        /* Screen 3: Game */
+        #screen-game {
+            max-width: 900px;
+            margin: 1rem auto;
+            padding: 1rem;
+        }
+
+        .game-status {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .status-item { font-weight: bold; display: flex; align-items: center; gap: 0.5rem; }
+
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: var(--border);
+            border-radius: 5px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .timer-container {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: var(--warning);
+            width: 100%;
+        }
+
+        .question-box {
+            background: var(--bg-card);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .mission-tag {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .question-text { font-size: 1.3rem; margin-bottom: 1.5rem; font-weight: 600; }
+        .scenario { color: var(--text-muted); margin-bottom: 2rem; line-height: 1.6; }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .option-btn {
+            background: var(--bg-body);
+            border: 2px solid var(--border);
+            padding: 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: var(--text-main);
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+            background: rgba(88,101,242,0.05);
+        }
+
+        .hint-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 1rem;
+        }
+
+        /* Modal Feedback */
+        #modal-feedback {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            max-width: 500px;
+            width: 100%;
+            padding: 2.5rem;
+            border-radius: 24px;
+            text-align: center;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .modal-title { font-size: 1.8rem; margin-bottom: 1rem; }
+        .modal-desc { margin-bottom: 1.5rem; color: var(--text-muted); line-height: 1.5; }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px; height: 10px;
+            background-color: var(--primary);
+            z-index: 200;
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .options-grid, .concepts-grid { grid-template-columns: 1fr; }
+            .hero h2 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+
+    <div class="bg-glow" id="bg-glow"></div>
+
+    <header>
+        <div class="logo">
+            <h1>Teach Place</h1>
+        </div>
+        <div class="controls">
+            <button id="btn-theme" title="Cambiar Tema">🌓</button>
+            <button id="btn-sound" title="Activar/Desactivar Sonido">🔊</button>
+        </div>
+    </header>
+
+    <!-- PANTALLA INICIO -->
+    <main id="screen-home">
+        <section class="hero">
+            <h2>El mundo que necesitas</h2>
+            <p>Conviértete en un arquitecto de comunidades dominando la creación de bots para Discord.</p>
+        </section>
+
+        <div class="worlds-grid" id="worlds-container">
+            <!-- Cargado dinámicamente -->
+        </div>
+    </main>
+
+    <!-- PANTALLA LECCIÓN -->
+    <main id="screen-lesson" class="hidden">
+        <div class="lesson-header">
+            <div id="lesson-icon" style="font-size: 4rem;">🤖</div>
+            <h2 id="lesson-title">Mundo 1: Configuración</h2>
+        </div>
+        
+        <div class="lesson-card">
+            <p id="lesson-desc">Aprende los cimientos para que tu bot cobre vida.</p>
+            
+            <div class="tech-key">
+                <strong>Clave Técnica:</strong> <span id="lesson-key">El Token es el ADN de tu bot.</span>
+            </div>
+
+            <div class="concepts-grid" id="lesson-concepts">
+                <!-- Conceptos dinámicos -->
+            </div>
+
+            <button class="btn-action" onclick="game.startWorld()">¡Iniciar Desafíos!</button>
+            <button class="hint-btn" onclick="navigation.home()" style="width:100%">Volver al Inicio</button>
+        </div>
+    </main>
+
+    <!-- PANTALLA JUEGO -->
+    <main id="screen-game" class="hidden">
+        <div class="game-status">
+            <div class="status-item">🏆 <span id="game-score">0</span></div>
+            <div class="status-item">❤️ <span id="game-lives">3</span></div>
+            <div class="status-item">⏳ <span id="game-time-text">60s</span></div>
+            <button class="hint-btn" onclick="navigation.home()">🏠 Salir</button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="game-progress"></div>
+        </div>
+
+        <div class="timer-container">
+            <div class="timer-bar" id="timer-bar"></div>
+        </div>
+
+        <div class="question-box">
+            <span class="mission-tag" id="game-mission">Misión 1</span>
+            <div class="question-text" id="game-question">¿Qué herramienta se usa para crear la aplicación del bot?</div>
+            <div class="scenario" id="game-scenario">Estás iniciando tu proyecto y necesitas registrar tu bot en los servidores oficiales.</div>
+            
+            <div class="options-grid" id="game-options">
+                <!-- Botones de opción -->
+            </div>
+
+            <button class="hint-btn" id="btn-hint" onclick="game.showHint()">💡 ¿Necesitas una pista?</button>
+        </div>
+    </main>
+
+    <!-- MODAL FEEDBACK -->
+    <div id="modal-feedback" class="hidden">
+        <div class="modal-content">
+            <div class="modal-icon" id="modal-icon">✅</div>
+            <h3 class="modal-title" id="modal-title">¡Excelente!</h3>
+            <p class="modal-desc" id="modal-desc">Explicación técnica del acierto.</p>
+            <div id="modal-remember" style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--primary);"></div>
+            <button class="btn-action" id="modal-next-btn">Siguiente Nivel</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- DATOS DE LA APLICACIÓN --- */
+        const WORLDS = [
+            {
+                id: 1, title: "Portal de Desarrolladores", icon: "🛠️",
+                desc: "Configuración inicial y creación del perfil del bot.",
+                key: "El Developer Portal es el panel de control oficial de Discord.",
+                concepts: ["App ID", "Bot Token", "Intents", "OAuth2"],
+                levels: [
+                    {
+                        mission: "Registro",
+                        question: "¿Dónde se registra inicialmente un nuevo Bot?",
+                        scenario: "Necesitas obtener las credenciales básicas para que Discord reconozca tu programa.",
+                        options: ["Discord App", "Developer Portal", "Google Cloud", "NPM"],
+                        correct: 1,
+                        hint: "Es el sitio oficial de Discord para programadores.",
+                        explanation: "El Discord Developer Portal es el lugar central para gestionar aplicaciones y bots.",
+                        remember: "Nunca compartas tu Token con nadie.",
+                        goal: "Obtener el Client ID"
+                    },
+                    {
+                        mission: "El Token",
+                        question: "¿Qué representa el Token del bot?",
+                        scenario: "Tu código necesita identificarse para conectarse a los WebSockets de Discord.",
+                        options: ["Nombre del bot", "Contraseña de usuario", "Clave de acceso única", "ID del servidor"],
+                        correct: 2,
+                        hint: "Es como el ADN o la llave maestra.",
+                        explanation: "El Token permite que el código tome control de la cuenta del bot.",
+                        remember: "Si se filtra, debes regenerarlo inmediatamente.",
+                        goal: "Autenticar el bot"
+                    }
+                ]
+            },
+            {
+                id: 2, title: "Entorno de Desarrollo", icon: "💻",
+                desc: "Node.js y la librería Discord.js.",
+                key: "Discord.js es un envoltorio potente para la API oficial.",
+                concepts: ["Node.js", "NPM", "Package.json", "Discord.js"],
+                levels: [
+                    {
+                        mission: "Instalación",
+                        question: "¿Qué comando instala la librería principal?",
+                        scenario: "Estás en la terminal y quieres traer las dependencias necesarias.",
+                        options: ["npm install discord.js", "get discord", "install bot", "npm start"],
+                        correct: 0,
+                        hint: "Usa el gestor de paquetes de Node.",
+                        explanation: "npm install es el estándar para añadir librerías en Node.js.",
+                        remember: "Debes estar dentro de la carpeta del proyecto.",
+                        goal: "Instalar dependencias"
+                    }
+                ]
+            },
+            {
+                id: 3, title: "Eventos y Respuestas", icon: "⚡",
+                desc: "Haciendo que el bot reaccione a mensajes.",
+                key: "Los eventos permiten que el bot 'escuche' lo que sucede.",
+                concepts: ["Ready Event", "MessageCreate", "Listeners", "Callbacks"],
+                levels: [
+                    {
+                        mission: "Escucha",
+                        question: "¿Qué evento detecta un nuevo mensaje?",
+                        scenario: "Quieres que el bot responda '¡Hola!' cuando alguien escriba en el chat.",
+                        options: ["onReady", "messageCreate", "interactionCreate", "onJoin"],
+                        correct: 1,
+                        hint: "Se refiere a la creación de un mensaje.",
+                        explanation: "messageCreate se dispara cada vez que llega un mensaje a un canal que el bot puede ver.",
+                        remember: "Los bots necesitan 'Intents' específicos para leer contenido.",
+                        goal: "Detectar actividad"
+                    }
+                ]
+            },
+            {
+                id: 4, title: "Comandos de Barra (/) ", icon: "⌨️",
+                desc: "Interacciones modernas y Slash Commands.",
+                key: "Los Slash Commands son la forma estándar y segura de interactuar.",
+                concepts: ["Slash Commands", "Application Commands", "Interaction", "Deploy"],
+                levels: [
+                    {
+                        mission: "Interacción",
+                        question: "¿Qué objeto se recibe al usar un Slash Command?",
+                        scenario: "El usuario escribe /ping y el bot debe procesarlo.",
+                        options: ["Message", "Interaction", "User", "Client"],
+                        correct: 1,
+                        hint: "Es el nuevo estándar que reemplaza a los mensajes directos.",
+                        explanation: "Las interacciones contienen toda la info del comando ejecutado.",
+                        remember: "Debes responder con interaction.reply().",
+                        goal: "Manejar comandos"
+                    }
+                ]
+            },
+            {
+                id: 5, title: "Privilegios e Intents", icon: "🔐",
+                desc: "Permisos especiales y seguridad.",
+                key: "Los Privileged Intents requieren activación manual en el portal.",
+                concepts: ["Guilds", "Presence", "Members", "Gateway"],
+                levels: [
+                    {
+                        mission: "Permisos",
+                        question: "¿Para qué sirve el Intent 'GuildMembers'?",
+                        scenario: "Tu bot necesita dar la bienvenida a cada usuario nuevo que entre.",
+                        options: ["Borrar mensajes", "Ver lista de miembros", "Cambiar nombres", "Crear canales"],
+                        correct: 1,
+                        hint: "Tiene que ver con la gestión de personas en el gremio.",
+                        explanation: "Es un intent privilegiado para rastrear entradas y salidas de miembros.",
+                        remember: "Actívalo en el Developer Portal antes de usarlo en código.",
+                        goal: "Gestionar miembros"
+                    }
+                ]
+            },
+            {
+                id: 6, title: "Despliegue (Hosting)", icon: "☁️",
+                desc: "Manteniendo el bot encendido 24/7.",
+                key: "Un bot en tu PC se apaga si cierras la tapa.",
+                concepts: ["VPS", "PaaS", "PM2", "Environment Vars"],
+                levels: [
+                    {
+                        mission: "Persistencia",
+                        question: "¿Qué herramienta ayuda a mantener el bot vivo tras un error?",
+                        scenario: "El bot crashea por un error de red y quieres que se reinicie solo.",
+                        options: ["Notepad", "PM2", "Discord App", "Chrome"],
+                        correct: 1,
+                        hint: "Es un gestor de procesos para Node.js.",
+                        explanation: "PM2 monitorea tu script y lo reinicia automáticamente si falla.",
+                        remember: "Ideal para servidores VPS.",
+                        goal: "Garantizar uptime"
+                    }
+                ]
+            }
+        ];
+
+        /* --- LOGICA DEL MOTOR --- */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let soundEnabled = true;
+
+        const playTone = (freq, type, duration) => {
+            if (!soundEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        };
+
+        const sounds = {
+            click: () => playTone(600, 'sine', 0.1),
+            success: () => { playTone(800, 'sine', 0.2); setTimeout(() => playTone(1200, 'sine', 0.3), 100); },
+            error: () => { playTone(200, 'square', 0.3); },
+            start: () => playTone(440, 'triangle', 0.5),
+            warn: () => playTone(900, 'sawtooth', 0.1)
+        };
+
+        const navigation = {
+            home: () => {
+                document.getElementById('screen-home').classList.remove('hidden');
+                document.getElementById('screen-lesson').classList.add('hidden');
+                document.getElementById('screen-game').classList.add('hidden');
+                game.currentWorld = null;
+            },
+            lesson: (world) => {
+                game.currentWorld = world;
+                document.getElementById('screen-home').classList.add('hidden');
+                document.getElementById('screen-lesson').classList.remove('hidden');
+                
+                document.getElementById('lesson-icon').innerText = world.icon;
+                document.getElementById('lesson-title').innerText = world.title;
+                document.getElementById('lesson-desc').innerText = world.desc;
+                document.getElementById('lesson-key').innerText = world.key;
+                
+                const conceptContainer = document.getElementById('lesson-concepts');
+                conceptContainer.innerHTML = '';
+                world.concepts.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = 'concept-item';
+                    div.innerText = `🔹 ${c}`;
+                    conceptContainer.appendChild(div);
+                });
+            },
+            game: () => {
+                document.getElementById('screen-lesson').classList.add('hidden');
+                document.getElementById('screen-game').classList.remove('hidden');
+            }
+        };
+
+        const game = {
+            currentWorld: null,
+            levelIndex: 0,
+            score: 0,
+            lives: 3,
+            timeLeft: 60,
+            timerInterval: null,
+
+            init() {
+                const container = document.getElementById('worlds-container');
+                WORLDS.forEach(w => {
+                    const card = document.createElement('div');
+                    card.className = 'world-card';
+                    card.innerHTML = `
+                        <div class="icon">${w.icon}</div>
+                        <h3>Mundo ${w.id}</h3>
+                        <p>${w.title}</p>
+                    `;
+                    card.onclick = () => { sounds.click(); navigation.lesson(w); };
+                    container.appendChild(card);
+                });
+
+                document.getElementById('btn-theme').onclick = () => {
+                    const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.body.setAttribute('data-theme', theme);
+                    sounds.click();
+                };
+
+                document.getElementById('btn-sound').onclick = (e) => {
+                    soundEnabled = !soundEnabled;
+                    e.target.innerText = soundEnabled ? '🔊' : '🔇';
+                };
+
+                this.createGlow();
+            },
+
+            createGlow() {
+                const container = document.getElementById('bg-glow');
+                for(let i=0; i<5; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'glow-circle';
+                    div.style.top = Math.random() * 100 + '%';
+                    div.style.left = Math.random() * 100 + '%';
+                    container.appendChild(div);
+                }
+            },
+
+            startWorld() {
+                this.levelIndex = 0;
+                this.score = 0;
+                this.lives = 3;
+                sounds.start();
+                this.loadLevel();
+                navigation.game();
+            },
+
+            loadLevel() {
+                const level = this.currentWorld.levels[this.levelIndex];
+                document.getElementById('game-score').innerText = this.score;
+                document.getElementById('game-lives').innerText = this.lives;
+                document.getElementById('game-mission').innerText = `Misión ${this.levelIndex + 1}: ${level.mission}`;
+                document.getElementById('game-question').innerText = level.question;
+                document.getElementById('game-scenario').innerText = level.scenario;
+                
+                const optionsBox = document.getElementById('game-options');
+                optionsBox.innerHTML = '';
+                level.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    btn.onclick = () => this.checkAnswer(idx);
+                    optionsBox.appendChild(btn);
+                });
+
+                const progress = ((this.levelIndex) / this.currentWorld.levels.length) * 100;
+                document.getElementById('game-progress').style.width = progress + '%';
+
+                this.startTimer();
+            },
+
+            startTimer() {
+                clearInterval(this.timerInterval);
+                this.timeLeft = 60;
+                this.updateTimerUI();
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    this.updateTimerUI();
+                    if (this.timeLeft <= 10) sounds.warn();
+                    if (this.timeLeft <= 0) {
+                        this.loseLife("¡Se acabó el tiempo!");
+                    }
+                }, 1000);
+            },
+
+            updateTimerUI() {
+                document.getElementById('game-time-text').innerText = this.timeLeft + 's';
+                document.getElementById('timer-bar').style.width = (this.timeLeft / 60) * 100 + '%';
+            },
+
+            showHint() {
+                const level = this.currentWorld.levels[this.levelIndex];
+                alert(`💡 Pista: ${level.hint}`);
+            },
+
+            checkAnswer(idx) {
+                clearInterval(this.timerInterval);
+                const level = this.currentWorld.levels[this.levelIndex];
+                if (idx === level.correct) {
+                    this.score += 100 + this.timeLeft;
+                    this.showFeedback(true, level);
+                    this.createConfetti();
+                } else {
+                    this.loseLife("Respuesta incorrecta");
+                }
+            },
+
+            loseLife(reason) {
+                this.lives--;
+                sounds.error();
+                document.getElementById('game-lives').innerText = this.lives;
+                if (this.lives <= 0) {
+                    this.showFeedback(false, { explanation: "Has agotado tus intentos. ¡Vuelve a repasar la lección!" }, true);
+                } else {
+                    this.showFeedback(false, { explanation: reason + ". Pierdes una vida." });
+                }
+            },
+
+            showFeedback(isCorrect, level, isGameOver = false) {
+                const modal = document.getElementById('modal-feedback');
+                const title = document.getElementById('modal-title');
+                const desc = document.getElementById('modal-desc');
+                const icon = document.getElementById('modal-icon');
+                const remember = document.getElementById('modal-remember');
+                const btn = document.getElementById('modal-next-btn');
+
+                modal.classList.remove('hidden');
+
+                if (isCorrect) {
+                    sounds.success();
+                    icon.innerText = "✅";
+                    title.innerText = "¡Correcto!";
+                    desc.innerText = level.explanation;
+                    remember.innerText = `Recuerda: ${level.remember}`;
+                    btn.innerText = "Siguiente Desafío";
+                    btn.onclick = () => {
+                        modal.classList.add('hidden');
+                        this.nextLevel();
+                    };
+                } else {
+                    icon.innerText = "❌";
+                    title.innerText = isGameOver ? "Fin del Juego" : "¡Cuidado!";
+                    desc.innerText = level.explanation;
+                    remember.innerText = "";
+                    btn.innerText = isGameOver ? "Volver al Inicio" : "Reintentar Nivel";
+                    btn.onclick = () => {
+                        modal.classList.add('hidden');
+                        if (isGameOver) navigation.home();
+                        else this.loadLevel();
+                    };
+                }
+            },
+
+            nextLevel() {
+                this.levelIndex++;
+                if (this.levelIndex < this.currentWorld.levels.length) {
+                    this.loadLevel();
+                } else {
+                    this.showVictory();
+                }
+            },
+
+            showVictory() {
+                const modal = document.getElementById('modal-feedback');
+                modal.classList.remove('hidden');
+                document.getElementById('modal-icon').innerText = "🏆";
+                document.getElementById('modal-title').innerText = "¡Mundo Completado!";
+                document.getElementById('modal-desc').innerText = `Has dominado todos los conceptos de este módulo. Puntaje final: ${this.score}`;
+                document.getElementById('modal-next-btn').innerText = "Volver a Mundos";
+                document.getElementById('modal-next-btn').onclick = () => {
+                    modal.classList.add('hidden');
+                    navigation.home();
+                };
+            },
+
+            createConfetti() {
+                for(let i=0; i<30; i++) {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.top = '-10px';
+                    c.style.backgroundColor = `hsl(${Math.random() * 360}, 70%, 50%)`;
+                    document.body.appendChild(c);
+                    
+                    const anim = c.animate([
+                        { transform: 'translateY(0) rotate(0)', opacity: 1 },
+                        { transform: `translateY(100vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ], { duration: 2000, easing: 'ease-out' });
+                    anim.onfinish = () => c.remove();
+                }
+            }
+        };
+
+        window.onload = () => game.init();
+
+    </script>
+</body>
+</html>
