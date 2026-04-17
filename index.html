@@ -2,134 +2,252 @@
 <html lang="es" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teach Place Arena</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=jet-brains-mono@400,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Teach Place – Discord Bot Academy</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="leaderboard.css" />
 </head>
 <body>
-  <a class="skip-link" href="#main">Saltar al contenido</a>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand-wrap">
-        <div class="brand-mark" aria-hidden="true">
-          <span>⟐</span>
-        </div>
-        <div>
-          <p class="eyebrow">Discord bot trainer</p>
-          <h1 class="brand-title">Teach Place Arena</h1>
-        </div>
+
+<!-- FLOATING AMBIENT ICONS -->
+<div class="ambient-layer" id="ambientLayer"></div>
+
+<!-- =========================================
+     SCREEN 0: NICKNAME ENTRY
+     ========================================= -->
+<div id="screenNick" class="screen active">
+  <div class="nick-wrap">
+    <div class="nick-logo">
+      <span class="brand-icon">⚙️</span>
+      <span class="brand-name">Teach<span class="accent">Place</span></span>
+    </div>
+    <div class="nick-card">
+      <div class="nick-avatar" id="nickAvatar">🤖</div>
+      <h2 class="nick-title">¿Cómo te llamamos?</h2>
+      <p class="nick-sub">Tu nombre aparecerá en la tabla de clasificación global.</p>
+      <div class="nick-input-wrap">
+        <input type="text" id="nickInput" class="nick-input" maxlength="20" placeholder="Tu nombre o alias..." autocomplete="off" spellcheck="false"/>
+        <span class="nick-counter" id="nickCounter">0/20</span>
       </div>
-      <div class="topbar-actions">
-        <button class="icon-btn" id="themeToggle" aria-label="Cambiar tema">◐</button>
-        <button class="icon-btn" id="resetProgress" aria-label="Reiniciar progreso">↺</button>
-      </div>
-    </header>
+      <div class="nick-avatars-row" id="nickAvatarsRow"></div>
+      <button class="primary-btn" id="btnNickOk">Empezar aventura →</button>
+    </div>
+  </div>
+</div>
 
-    <main id="main" class="layout-grid">
-      <aside class="sidebar card">
-        <section class="profile-box">
-          <p class="section-kicker">Piloto</p>
-          <label class="field-label" for="nicknameInput">Nick para score</label>
-          <div class="nick-row">
-            <input id="nicknameInput" class="text-input" maxlength="18" placeholder="Ej. JonByte" />
-            <button id="saveNick" class="secondary-btn">Guardar</button>
-          </div>
-          <p id="nickPreview" class="muted">Sin nickname guardado.</p>
-        </section>
+<!-- =========================================
+     SCREEN 1: HOME
+     ========================================= -->
+<div id="screenHome" class="screen">
+  <header class="home-header">
+    <div class="brand">
+      <span class="brand-icon">⚙️</span>
+      <span class="brand-name">Teach<span class="accent">Place</span></span>
+    </div>
+    <div class="header-controls">
+      <button class="ctrl-btn player-pill" id="btnPlayerPill" title="Tu perfil">
+        <span id="headerAvatar">🤖</span>
+        <span id="headerNick">Player</span>
+      </button>
+      <button class="ctrl-btn" id="btnLeaderboard" title="Clasificación">🏆</button>
+      <button class="ctrl-btn" id="btnSound" title="Sonido">🔊</button>
+      <button class="ctrl-btn" id="btnTheme" title="Tema">🌙</button>
+    </div>
+  </header>
 
-        <section class="stats-panel">
-          <div class="stat-box">
-            <span>Score total</span>
-            <strong id="totalScore">0</strong>
-          </div>
-          <div class="stat-box">
-            <span>Racha</span>
-            <strong id="bestStreak">0</strong>
-          </div>
-          <div class="stat-box">
-            <span>Nivel</span>
-            <strong id="completedLevels">0</strong>
-          </div>
-        </section>
+  <section class="hero">
+    <div class="hero-badge">Discord Bot Academy · 3 Lenguajes · 7 Mundos</div>
+    <h1 class="hero-title">Teach<span class="accent">Place</span></h1>
+    <p class="hero-sub">El mundo que necesitas</p>
+    <p class="hero-desc">
+      Domina la creación de <strong>Bots para Discord</strong> con <strong>discord.js</strong>, <strong>discord.py</strong> y <strong>JDA (Java)</strong>.<br/>
+      Retos de código, puzzles, drag-and-drop y mucho más.
+    </p>
 
-        <section>
-          <div class="section-head">
-            <p class="section-kicker">Lenguajes</p>
-            <button id="shuffleCatalog" class="tiny-btn">Aleatorizar</button>
-          </div>
-          <div id="libraryFilters" class="pill-row"></div>
-        </section>
+    <!-- LANGUAGE SELECTOR -->
+    <div class="lang-tabs" id="langTabs">
+      <button class="lang-tab active" data-lang="js">
+        <span class="lang-icon">🟨</span> discord.js
+      </button>
+      <button class="lang-tab" data-lang="py">
+        <span class="lang-icon">🐍</span> discord.py
+      </button>
+      <button class="lang-tab" data-lang="java">
+        <span class="lang-icon">☕</span> JDA (Java)
+      </button>
+    </div>
 
-        <section>
-          <p class="section-kicker">Tabla local</p>
-          <div id="leaderboard" class="leaderboard-list"></div>
-        </section>
-      </aside>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-n" id="statWorlds">7</span><span class="stat-l">Mundos</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-n" id="statLevels">55</span><span class="stat-l">Niveles</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-n" id="statScore">0</span><span class="stat-l">Tus pts</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-n" id="statStreak">0🔥</span><span class="stat-l">Racha</span></div>
+    </div>
+  </section>
 
-      <section class="content-area">
-        <section class="hero card hero-card">
-          <div>
-            <p class="section-kicker">Entrenamiento interactivo</p>
-            <h2>Más variedad, más azar y mejores retos</h2>
-            <p class="hero-copy">Ahora tienes partidas con preguntas mezcladas, bloques de código, emparejar conceptos, detectar errores, niveles por librería y score local guardado en el navegador.</p>
-          </div>
-          <div class="hero-actions">
-            <button id="quickStart" class="primary-btn">Jugar partida rápida</button>
-            <button id="openIdeas" class="secondary-btn">Ver ideas futuras</button>
-          </div>
-        </section>
+  <section class="worlds-grid" id="worldsGrid"></section>
 
-        <section>
-          <div class="section-head section-head-space">
-            <div>
-              <p class="section-kicker">Mundos</p>
-              <h3 class="section-title">Rutas por tecnología</h3>
-            </div>
-            <p class="muted">discord.js, discord.py, JDA y disnake.</p>
-          </div>
-          <div id="worldGrid" class="world-grid"></div>
-        </section>
+  <footer class="home-footer">
+    <span>© 2025 Teach Place · Hardware &amp; Redes · Discord Bot Academy</span>
+  </footer>
+</div>
 
-        <section id="gameSection" class="card game-panel hidden" aria-live="polite">
-          <div class="game-top">
-            <div>
-              <p id="gameMeta" class="section-kicker">Partida</p>
-              <h3 id="gameTitle">Selecciona un nivel</h3>
-            </div>
-            <div class="game-mini-stats">
-              <span>Puntos: <strong id="runScore">0</strong></span>
-              <span>Tiempo: <strong id="timerText">--</strong></span>
-            </div>
-          </div>
-          <div class="progress-rail"><div id="progressFill" class="progress-fill"></div></div>
-          <article id="challengeCard" class="challenge-card"></article>
-          <div class="game-actions">
-            <button id="nextChallenge" class="primary-btn hidden">Siguiente reto</button>
-            <button id="leaveGame" class="ghost-btn">Salir</button>
-          </div>
-        </section>
-      </section>
-    </main>
+<!-- =========================================
+     SCREEN 2: LECCIÓN
+     ========================================= -->
+<div id="screenLesson" class="screen">
+  <div class="lesson-wrap">
+    <button class="back-btn" id="btnLessonBack">← Inicio</button>
+    <div class="lesson-world-badge" id="lessonBadge"></div>
+    <h2 class="lesson-title" id="lessonTitle"></h2>
+    <p class="lesson-intro" id="lessonIntro"></p>
+
+    <div class="key-card" id="lessonKey">
+      <span class="key-icon">🔑</span>
+      <p id="lessonKeyText"></p>
+    </div>
+
+    <div class="concepts-grid" id="conceptsGrid"></div>
+
+    <!-- LEVEL MAP -->
+    <div class="level-map" id="levelMap"></div>
+
+    <button class="primary-btn" id="btnStartWorld">¡Comenzar los retos! 🚀</button>
+  </div>
+</div>
+
+<!-- =========================================
+     SCREEN 3: JUEGO
+     ========================================= -->
+<div id="screenGame" class="screen">
+  <div class="game-topbar">
+    <button class="ctrl-btn" id="btnGameHome" title="Inicio">🏠</button>
+    <div class="game-meta">
+      <span class="meta-world" id="gameWorldLabel"></span>
+      <span class="meta-level" id="gameLevelLabel"></span>
+    </div>
+    <div class="game-controls-right">
+      <span class="streak-badge" id="gameStreak">🔥 ×0</span>
+      <button class="ctrl-btn" id="btnGameSound" title="Sonido">🔊</button>
+    </div>
   </div>
 
-  <dialog id="ideasDialog" class="ideas-dialog">
-    <div class="dialog-inner">
-      <p class="section-kicker">Ideas para implementar</p>
-      <h3>Lo siguiente que podrías sumar</h3>
-      <ul class="idea-list">
-        <li>Modo ranked por librería con temporadas locales.</li>
-        <li>Retos de arrastrar y ordenar pasos de un comando.</li>
-        <li>Editor sandbox con tests simples sobre snippets.</li>
-        <li>Desbloqueo de logros: “sin pistas”, “racha perfecta”, “multi-stack”.</li>
-        <li>Daily challenge con semilla del día para comparar scores.</li>
-      </ul>
-      <button id="closeIdeas" class="primary-btn">Cerrar</button>
-    </div>
-  </dialog>
+  <div class="game-progress-wrap">
+    <div class="game-progress-bar"><div class="game-progress-fill" id="progressFill"></div></div>
+    <div class="timer-bar-wrap"><div class="timer-bar-fill" id="timerFill"></div></div>
+  </div>
 
-  <script src="./game.js" defer></script>
+  <div class="game-hud">
+    <div class="hud-item score-box">
+      <span class="hud-label">Puntos</span>
+      <span class="hud-val" id="scoreDisplay">0</span>
+    </div>
+    <div class="hud-item lives-box">
+      <span class="hud-label">Vidas</span>
+      <div class="lives-icons" id="livesDisplay"></div>
+    </div>
+    <div class="hud-item timer-box">
+      <span class="hud-label">Tiempo</span>
+      <span class="hud-val timer-val" id="timerDisplay">60</span>
+    </div>
+  </div>
+
+  <!-- GAME CARD — el tipo se rota via JS -->
+  <div class="game-card" id="gameCard">
+    <div class="mission-tag" id="missionTag"></div>
+    <div class="challenge-type-badge" id="challengeBadge"></div>
+    <h3 class="game-question" id="gameQuestion"></h3>
+
+    <!-- Fragmento de código -->
+    <div class="game-fragment" id="gameFragment"></div>
+
+    <!-- TIPO: multiple choice -->
+    <div class="challenge-zone" id="zoneMultiple">
+      <div class="options-grid" id="optionsGrid"></div>
+    </div>
+
+    <!-- TIPO: code blocks (drag to order) -->
+    <div class="challenge-zone hidden" id="zoneOrder">
+      <p class="zone-label">Arrastra las líneas para ordenar el código correctamente:</p>
+      <div class="sortable-list" id="sortableList"></div>
+      <button class="primary-btn sm-btn" id="btnCheckOrder">✔ Verificar orden</button>
+    </div>
+
+    <!-- TIPO: match pairs -->
+    <div class="challenge-zone hidden" id="zoneMatch">
+      <p class="zone-label">Conecta cada elemento con su pareja:</p>
+      <div class="match-columns" id="matchColumns"></div>
+      <button class="primary-btn sm-btn" id="btnCheckMatch">✔ Verificar conexiones</button>
+    </div>
+
+    <!-- TIPO: find the bug -->
+    <div class="challenge-zone hidden" id="zoneBug">
+      <p class="zone-label">Selecciona la línea que contiene el error:</p>
+      <div class="bug-lines" id="bugLines"></div>
+    </div>
+
+    <!-- TIPO: fill blank -->
+    <div class="challenge-zone hidden" id="zoneFill">
+      <div class="fill-wrap" id="fillWrap"></div>
+      <div class="fill-options" id="fillOptions"></div>
+    </div>
+
+    <div class="game-hint" id="gameHint"><span class="hint-icon">💡</span> <span id="hintText"></span></div>
+  </div>
+</div>
+
+<!-- =========================================
+     MODAL: RETROALIMENTACIÓN
+     ========================================= -->
+<div id="feedbackModal" class="modal-overlay hidden">
+  <div class="modal-card" id="modalCard">
+    <div class="modal-emoji" id="modalEmoji"></div>
+    <h3 class="modal-title" id="modalTitle"></h3>
+    <p class="modal-body" id="modalBody"></p>
+    <div class="modal-remember" id="modalRemember"></div>
+    <div class="modal-xp" id="modalXP"></div>
+    <button class="primary-btn" id="btnModalNext"></button>
+  </div>
+</div>
+
+<!-- MODAL: MUNDO COMPLETADO -->
+<div id="worldDoneModal" class="modal-overlay hidden">
+  <div class="modal-card modal-done">
+    <div class="modal-emoji">🏆</div>
+    <h3 class="modal-title">¡Mundo Completado!</h3>
+    <p class="modal-body" id="worldDoneMsg"></p>
+    <div class="world-done-stars" id="worldDoneStars"></div>
+    <button class="primary-btn" id="btnWorldDone">Volver al inicio</button>
+  </div>
+</div>
+
+<!-- =========================================
+     PANEL: LEADERBOARD
+     ========================================= -->
+<div id="leaderboardPanel" class="side-panel hidden">
+  <div class="panel-header">
+    <h2 class="panel-title">🏆 Clasificación</h2>
+    <button class="ctrl-btn" id="btnCloseLeaderboard">✕</button>
+  </div>
+  <div class="panel-tabs">
+    <button class="panel-tab active" data-ltab="global">Global</button>
+    <button class="panel-tab" data-ltab="weekly">Esta semana</button>
+    <button class="panel-tab" data-ltab="personal">Tu historial</button>
+  </div>
+  <div class="leaderboard-body" id="leaderboardBody"></div>
+</div>
+<div class="panel-backdrop hidden" id="panelBackdrop"></div>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="data.js"></script>
+<script src="game.js"></script>
 </body>
 </html>
